@@ -7,6 +7,6 @@ namespace Interact.Library.Components
 {
     public interface IWorker<T>
     {
-        void DoWork(T payload, Endpoint endpoint, INotification<T> notify );
+        void DoWork(T payload, Endpoint endpoint, INotification<T> notify);
     }
 }
