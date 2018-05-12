@@ -13,7 +13,7 @@ namespace Interact.Library.Components
 
         public AWSComponent(string accessKey, string secretKey)
         {
-            Credentials = new BasicAWSCredentials(accessKey, secretKey);
+            _Credentials = new BasicAWSCredentials(accessKey, secretKey);
         }
 
         public ICollection<Message> RetriveQueueObjects(string queueUrl, RegionEndpoint region, int visibilityTimeout, int maxNumberOfMessages, int waitTimeSeconds = 0)
