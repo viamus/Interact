@@ -29,7 +29,7 @@ namespace Interact.Library.Components
                 }
             }
         }
-        public ConcurrentBag<T> MemoryQueue { get; set; } = new ConcurrentBag<T>();
+        public ConcurrentQueue<T> MemoryQueue { get; set; } = new ConcurrentQueue<T>();
         public string ThreadGuid { get; set; } = Guid.NewGuid().ToString();
         public string ThreadGroup { get; set; } = $"DefaultGroup";
         public int MaxMemoryQueueObjects { get; set; } = 10;
@@ -65,9 +65,9 @@ namespace Interact.Library.Components
                 {
                     NotifyConsumerClientStatus();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not send the consumer client status to the server.");
+                    Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not send the consumer client status to the server.", exception: ex);
                     _ConsumerStatus = ConsumerStatus.OFFLINE;
                 }
             }
@@ -84,9 +84,9 @@ namespace Interact.Library.Components
                 {
                     _ConsumerStatus = GetConsumerServerStatus();
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not load the consumer server status.");
+                    Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not load the consumer server status.", exception: ex);
                     _ConsumerStatus = ConsumerStatus.OFFLINE;
                 }
 
@@ -133,13 +133,13 @@ namespace Interact.Library.Components
                     {
                         idleCount = 0;
                         _ConsumerStatus = ConsumerStatus.ONLINE;
-                        MemoryQueue.AddRange(objects);
+                        MemoryQueue.EnqueueRange(objects);
                     }
                    
                 }
-                catch (Exception)
+                catch (Exception ex)
                 {
-                    Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not get objects from queue.");
+                    Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not get objects from queue.",exception: ex);
                     _ConsumerStatus = ConsumerStatus.ONLINE_IDLE;
                 }
             }
@@ -161,7 +161,7 @@ namespace Interact.Library.Components
             }
             catch (Exception ex)
             {
-                Log.Fatal($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid} had a fatal error and got closed");
+                Log.Fatal($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid} had a fatal error and got closed", exception: ex);
                 _ConsumerStatus = ConsumerStatus.DISPOSE;
             }
         }
