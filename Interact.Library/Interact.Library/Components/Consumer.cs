@@ -104,6 +104,8 @@ namespace Interact.Library.Components
             {
                 try
                 {
+                    while (_ConsumerStatus == ConsumerStatus.OFFLINE) { await Task.Delay(1000); };
+
                     var objects = GetObjectsFromQueue(MaxMemoryQueueObjects - MemoryQueue.Count);
 
                     if (objects.NullOrEmpty())
@@ -124,7 +126,7 @@ namespace Interact.Library.Components
                             if (_ConsumerStatus == ConsumerStatus.ONLINE && idleCount % 50 > 1)
                             {
                                 _ConsumerStatus = ConsumerStatus.ONLINE_IDLE;
-                            }
+                            }          
                         }
                     }
                     else
