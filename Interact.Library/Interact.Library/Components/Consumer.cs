@@ -8,19 +8,30 @@ namespace Interact.Library.Components
 {
     public abstract class Consumer<T>
     {
-        private const int _ScheduleConsumerServerStatus = 30 * 1000;
-        private const int _ScheduleConsumerClientStatus = 30 * 1000;
+        private readonly TimeSpan SCHEDULE_CONSUMER_SERVER_STATUS = new TimeSpan(0, 0, 30);
+        private readonly TimeSpan SCHEDULE_CONSUMER_CLIENT_STATUS = new TimeSpan(0, 0, 30);
+        private readonly TimeSpan SCHEDULE_BASE_IDLE_TIME = new TimeSpan(0, 0, 30);
+        private readonly TimeSpan SCHEDULE_MAX_IDLE_TIME = new TimeSpan(0, 5, 0);
 
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-
+        private object _ConsumerStatusLocker { get; set; } = new object();
+        private ConsumerStatus _ConsumerStatus
+        {
+            get
+            {
+                return _ConsumerStatus;
+            }
+            set
+            {
+                lock (_ConsumerStatusLocker)
+                {
+                    _ConsumerStatus = value;
+                }
+            }
+        }
         public ConcurrentBag<T> MemoryQueue { get; set; } = new ConcurrentBag<T>();
-
-        private ConsumerStatus _ConsumerStatus { get; set; }
-
         public string ThreadGuid { get; set; } = Guid.NewGuid().ToString();
-
         public string ThreadGroup { get; set; } = $"DefaultGroup";
-
         public int MaxMemoryQueueObjects { get; set; } = 10;
 
         public Consumer(string ThreadGroup, int MaxMemoryQueueObjects)
@@ -43,13 +54,32 @@ namespace Interact.Library.Components
 
         protected abstract void NotifyConsumerClientStatus();
 
+        protected virtual async Task LoadConsumerClientStatus()
+        {
+            await Task.Delay(1000);
+
+            while (_ConsumerStatus != ConsumerStatus.DISPOSE)
+            {
+                await Task.Delay(SCHEDULE_CONSUMER_CLIENT_STATUS);
+                try
+                {
+                    NotifyConsumerClientStatus();
+                }
+                catch (Exception)
+                {
+                    Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not send the consumer client status to the server.");
+                    _ConsumerStatus = ConsumerStatus.OFFLINE;
+                }
+            }
+        }
+
         protected virtual async Task LoadConsumerServerStatus()
         {
             await Task.Delay(1000);
 
             while (_ConsumerStatus != ConsumerStatus.DISPOSE)
             {
-                await Task.Delay(_ScheduleConsumerServerStatus);
+                await Task.Delay(SCHEDULE_CONSUMER_SERVER_STATUS);
                 try
                 {
                     _ConsumerStatus = GetConsumerServerStatus();
@@ -64,40 +94,51 @@ namespace Interact.Library.Components
             }
         }
 
-        private async Task LoadConsumerClientStatus()
-        {
-            await Task.Delay(1000);
-
-            while (_ConsumerStatus != ConsumerStatus.DISPOSE)
-            {
-                await Task.Delay(_ScheduleConsumerClientStatus);
-                try
-                {
-                    NotifyConsumerClientStatus();
-                }
-                catch (Exception)
-                {
-                    Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not send the consumer client status to the server.");
-                    _ConsumerStatus = ConsumerStatus.OFFLINE;
-                }
-            }
-        }
-
         protected virtual async Task LoadConsumer()
         {
+            int idleCount = 0;
+
             await Task.Delay(1000);
 
             while (_ConsumerStatus != ConsumerStatus.DISPOSE)
             {
-                await Task.Delay(1000);
                 try
                 {
-                    MemoryQueue.AddRange(GetObjectsFromQueue(MaxMemoryQueueObjects - MemoryQueue.Count));
+                    var objects = GetObjectsFromQueue(MaxMemoryQueueObjects - MemoryQueue.Count);
+
+                    if (objects.NullOrEmpty())
+                    {
+                        idleCount++;
+
+                        if (_ConsumerStatus == ConsumerStatus.ONLINE_IDLE)
+                        {
+                            var waitingTime = idleCount * SCHEDULE_BASE_IDLE_TIME;
+                            if (waitingTime >= SCHEDULE_MAX_IDLE_TIME)
+                            {
+                                waitingTime = SCHEDULE_BASE_IDLE_TIME;
+                            }
+                            await Task.Delay(waitingTime);
+                        }
+                        else 
+                        {
+                            if (_ConsumerStatus == ConsumerStatus.ONLINE && idleCount % 50 > 1)
+                            {
+                                _ConsumerStatus = ConsumerStatus.ONLINE_IDLE;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        idleCount = 0;
+                        _ConsumerStatus = ConsumerStatus.ONLINE;
+                        MemoryQueue.AddRange(objects);
+                    }
+                   
                 }
                 catch (Exception)
                 {
                     Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not get objects from queue.");
-                    _ConsumerStatus = ConsumerStatus.IDLE;
+                    _ConsumerStatus = ConsumerStatus.ONLINE_IDLE;
                 }
             }
         }
@@ -116,7 +157,7 @@ namespace Interact.Library.Components
 
                 Log.Info($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid} disposing...");
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 Log.Fatal($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid} had a fatal error and got closed");
                 _ConsumerStatus = ConsumerStatus.DISPOSE;
@@ -130,6 +171,6 @@ namespace Interact.Library.Components
         DISPOSE,
         OFFLINE,
         ONLINE,
-        IDLE
+        ONLINE_IDLE,
     }
 }
