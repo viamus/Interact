@@ -14,7 +14,7 @@ namespace Interact.Library.Components
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private Endpoint _Endpoint;
         private ICollection<Notification> _Notifications;
-        private WorkerCompletedEvent _Callback;
+        private WorkerCompletedEvent _Callback = null;
 
         public string ThreadGuid { get; set; } = Guid.NewGuid().ToString();
         private string ThreadGroup { get; set; } = $"DefaultGroup";
@@ -24,6 +24,7 @@ namespace Interact.Library.Components
             ThreadGroup = threadGroup;
             _Endpoint = endpoint;
             _Notifications = notify;
+            _Callback = callback;
         }
 
         /// <summary>
