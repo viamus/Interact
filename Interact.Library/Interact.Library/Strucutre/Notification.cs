@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Interact.Library.Components
+namespace Interact.Library.Structure
 {
     public abstract class Notification
     {

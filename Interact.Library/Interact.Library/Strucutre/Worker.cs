@@ -1,11 +1,11 @@
-﻿using Interact.Library.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
+using Interact.Library.Interfaces;
 
-namespace Interact.Library.Components
+namespace Interact.Library.Structure
 {
     public delegate Task WorkerCompletedEvent(object identifier);
 

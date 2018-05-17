@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Interact.Library.Model
+namespace Interact.Library.Interfaces
 {
     public interface IWorkerObject
     {

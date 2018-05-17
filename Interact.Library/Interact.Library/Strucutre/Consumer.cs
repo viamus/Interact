@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Interact.Library.Components
+namespace Interact.Library.Structure
 {
     public abstract class Consumer<T>
     {
@@ -45,10 +45,6 @@ namespace Interact.Library.Components
         public abstract ICollection<T> GetObjectsFromQueue(int maxObjects);
 
         public abstract void RemoveObjectFromQueue(T @object);
-
-        public abstract void LockQueue();
-
-        public abstract void ReleaseQueue();
 
         public abstract ConsumerStatus GetConsumerServerStatus();
 

@@ -4,8 +4,11 @@ using Amazon.SQS;
 using Amazon.SQS.Model;
 using System;
 using System.Collections.Generic;
+using Interact.Library;
+using System.Net;
+using Interact.Instance.Exceptions;
 
-namespace Interact.Library.Components
+namespace Interact.Instance.Components.Amazon
 {
     public class AWSComponent
     {
@@ -54,5 +57,35 @@ namespace Interact.Library.Components
             }
         }
 
+        public void RemoveQueueObjects(string queueUrl, RegionEndpoint region, string receiptHandle)
+        {
+            if (queueUrl.NullOrEmpty())
+            {
+                throw new ArgumentException("Queue url is required.");
+            }
+
+          
+            using (var client = new AmazonSQSClient(_Credentials, region))
+            {
+                DeleteMessageRequest deleteMessageRequest = new DeleteMessageRequest();
+
+                deleteMessageRequest.QueueUrl = queueUrl;
+                deleteMessageRequest.ReceiptHandle = receiptHandle;
+
+                DeleteMessageResponse response = client.DeleteMessageAsync(deleteMessageRequest).Result;
+
+                var acceptedCodes = new List<HttpStatusCode>
+                {
+                    HttpStatusCode.Accepted,
+                    HttpStatusCode.OK,
+                    HttpStatusCode.NoContent
+                };
+
+                if (!acceptedCodes.Contains(response.HttpStatusCode))
+                {
+                    throw new AWSQueueMessageException($"Error on remove the message: {response.ResponseMetadata}");
+                }
+            }
+        }
     }
 }

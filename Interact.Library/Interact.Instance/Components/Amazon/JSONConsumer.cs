@@ -1,51 +1,78 @@
 ﻿using Interact.Instance.Data.Interface;
-using Interact.Library.Components;
+using Interact.Library.Structure;
 using Microsoft.Extensions.DependencyInjection;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
+using Newtonsoft.Json;
+using Microsoft.Extensions.Caching.Distributed;
+using Interact.Instance.Exceptions;
 
-namespace Interact.Instance.Components
+namespace Interact.Instance.Components.Amazon
 {
     public class JSONConsumer : Consumer<string>
     {
-        private AWSComponent _CloudComponent;
+        private AWSQueueConfiguration _QueueConfiguration;
         private IServiceProvider _Services;
 
-        public JSONConsumer(IServiceProvider services, string threadGroup, int maxMemoryQueueObjects):base(threadGroup, maxMemoryQueueObjects)
+        public JSONConsumer(IServiceProvider services, AWSQueueConfiguration queue, 
+                            string threadGroup, int maxMemoryQueueObjects):base(threadGroup, maxMemoryQueueObjects)
         {
             _Services = services;
-        }
-
-        public void LoadCloudComponent(string accessKey, string secretKey)
-        {
-            _CloudComponent = new AWSComponent(accessKey, secretKey);
+            _QueueConfiguration = queue;
         }
 
         public override ConsumerStatus GetConsumerServerStatus()
         {
-            var consumerDal = _Services.GetService<IConsumerDAL>();
-
+            using (var consumerDal = _Services.GetService<IConsumerDAL>())
+            {
+                return consumerDal.GetThreadGroupServerStatus(this.ThreadGroup);
+            }
         }
 
         public override ICollection<string> GetObjectsFromQueue(int maxObjects)
         {
-            throw new NotImplementedException();
+            var messages = _QueueConfiguration.RetriveQueueObjects();
+            return messages.Select(m => 
+            {
+                LockMessage(m.MessageId);
+                return JsonConvert.SerializeObject(m);
+
+           }).ToList();
         }
 
-        public override void LockQueue()
+        private void LockMessage(string identity)
         {
-            throw new NotImplementedException();
+            var redis = _Services.GetService<IDistributedCache>();
+            if (redis.GetString(identity) != null)
+            {
+                DistributedCacheEntryOptions opcoesCache =
+                       new DistributedCacheEntryOptions();
+                        opcoesCache.SetAbsoluteExpiration(
+                            TimeSpan.FromMinutes(1));
+
+                redis.SetString(identity, "Locked", opcoesCache);
+            }
+            else
+            {
+                throw new RedisLockedKeyException("Message already locked.");
+            }
         }
 
-        public override void ReleaseQueue()
+        private void ReleaseMessage(string identity)
         {
-            throw new NotImplementedException();
+            var redis = _Services.GetService<IDistributedCache>();
+            if (redis.GetString(identity) != null)
+            {
+                redis.Remove(identity);
+            }
         }
 
-        public override void RemoveObjectFromQueue(string @object)
+        public override void RemoveObjectFromQueue(string identity)
         {
-            throw new NotImplementedException();
+            _QueueConfiguration.RemoveQueueObjects(identity);
+            ReleaseMessage(identity);
         }
 
         protected override void NotifyConsumerClientStatus()
