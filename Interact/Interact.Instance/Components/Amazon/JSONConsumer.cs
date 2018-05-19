@@ -50,7 +50,7 @@ namespace Interact.Instance.Components.Amazon
                 DistributedCacheEntryOptions opcoesCache =
                        new DistributedCacheEntryOptions();
                         opcoesCache.SetAbsoluteExpiration(
-                            TimeSpan.FromMinutes(1));
+                            TimeSpan.FromMinutes(5));
 
                 redis.SetString(identity, "Locked", opcoesCache);
             }
@@ -77,7 +77,10 @@ namespace Interact.Instance.Components.Amazon
 
         protected override void NotifyConsumerClientStatus()
         {
-            throw new NotImplementedException();
+            using (var consumerDal = _Services.GetService<IConsumerDAL>())
+            {
+                consumerDal.SetConsumerThreadStatus(this.ThreadGroup, this.ThreadGuid, this._ConsumerStatus);
+            }
         }
     }
 }

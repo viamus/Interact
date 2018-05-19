@@ -15,7 +15,7 @@ namespace Interact.Library.Structure
 
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
         private object _ConsumerStatusLocker { get; set; } = new object();
-        private ConsumerStatus _ConsumerStatus
+        protected ConsumerStatus _ConsumerStatus
         {
             get
             {

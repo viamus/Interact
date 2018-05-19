@@ -1,0 +1,8 @@
+Installing docker redis:
+-- docker pull redis
+
+Running docker redis container:
+-- docker run --name interact-redis -d redis
+
+Kill docker redis container:
+-- docker container kill interact-redis
