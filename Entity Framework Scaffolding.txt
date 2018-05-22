@@ -1,0 +1,1 @@
+Scaffold-DbContext "Host=localhost;Database=interact;Username=postgres;Password=postgres" Npgsql.EntityFrameworkCore.PostgreSQL -o InteractDomain

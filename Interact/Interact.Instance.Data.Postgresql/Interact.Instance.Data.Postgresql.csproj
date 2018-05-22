@@ -5,13 +5,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="InteractDomain\" />
-  </ItemGroup>
-
-  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.0.3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.0.3" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="2.0.2" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL.Design" Version="1.1.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Interact.Instance.Data\Interact.Instance.Data.csproj" />
+    <ProjectReference Include="..\Interact.Library\Interact.Library.csproj" />
   </ItemGroup>
 
 </Project>
