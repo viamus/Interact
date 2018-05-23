@@ -1,8 +1,12 @@
 ﻿using Interact.Instance.Data.Interface;
+using Interact.Instance.Data.Postgresql.InteractDomain;
 using Interact.Library.Structure;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
+using System.Data;
+using System.Transactions;
 
 namespace Interact.Instance.Data.Postgresql.Data
 {
@@ -13,14 +17,21 @@ namespace Interact.Instance.Data.Postgresql.Data
             this.Dispose();
         }
 
-        public ConsumerStatus GetThreadGroupServerStatus(string threadGroup)
+        public Library.Structure.ConsumerStatus GetThreadGroupServerStatus(string threadGroup)
         {
-            throw new NotImplementedException();
+            using (var context = new InteractContext())
+            {
+                return context.CloudInstance.Where(c => c.Threadgroup == threadGroup).Select(c=> (Library.Structure.ConsumerStatus)c.ConsumerStatusId).FirstOrDefault();
+            }
         }
 
-        public void SetConsumerThreadStatus(string threadGroup, string indentifier, ConsumerStatus clientStatus)
+        public void SetConsumerThreadStatus(string threadGroup, string indentifier, Library.Structure.ConsumerStatus clientStatus)
         {
-            throw new NotImplementedException();
+            using (var context = new InteractContext())
+            {
+
+
+            }
         }
     }
 }

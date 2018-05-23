@@ -5,11 +5,12 @@ using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Interact.Instance.Data.Postgresql.InteractDomain
 {
-    [Table("consumer_server_status")]
-    public partial class ConsumerServerStatus
+    [Table("consumer_status")]
+    public partial class ConsumerStatus
     {
-        public ConsumerServerStatus()
+        public ConsumerStatus()
         {
+            CloudClientInstance = new HashSet<CloudClientInstance>();
             CloudInstance = new HashSet<CloudInstance>();
         }
 
@@ -19,7 +20,9 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
         [Column("name")]
         public string Name { get; set; }
 
-        [InverseProperty("ConsumerServerStatus")]
+        [InverseProperty("ConsumerStatus")]
+        public ICollection<CloudClientInstance> CloudClientInstance { get; set; }
+        [InverseProperty("ConsumerStatus")]
         public ICollection<CloudInstance> CloudInstance { get; set; }
     }
 }

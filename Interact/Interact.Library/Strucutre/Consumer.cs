@@ -166,9 +166,9 @@ namespace Interact.Library.Structure
 
     public enum ConsumerStatus
     {
-        DISPOSE,
-        OFFLINE,
-        ONLINE,
-        ONLINE_IDLE,
+        DISPOSE = 0,
+        OFFLINE = 1,
+        ONLINE = 2,
+        ONLINE_IDLE = 3,
     }
 }
