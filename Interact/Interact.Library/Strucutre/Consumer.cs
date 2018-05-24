@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Interact.Library.Interfaces;
+using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Text;
@@ -6,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Interact.Library.Structure
 {
-    public abstract class Consumer<T>
+    public abstract class Consumer<T> where T : IQueueObject
     {
         private readonly TimeSpan SCHEDULE_CONSUMER_SERVER_STATUS = new TimeSpan(0, 0, 30);
         private readonly TimeSpan SCHEDULE_CONSUMER_CLIENT_STATUS = new TimeSpan(0, 0, 30);

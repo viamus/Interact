@@ -17,15 +17,16 @@ namespace Interact.Library.Structure
         private ICollection<Notification> _Notifications;
         private WorkerCompletedEvent _Callback = null;
 
-        public string ThreadGuid { get; set; } = Guid.NewGuid().ToString();
-        private string ThreadGroup { get; set; } = $"DefaultGroup";
+        public string ThreadGroup { get; set; } = $"DefaultGroup";
+        private ICollection<HttpStatusCode> _SuccessHttpStatus { get; set; }
 
-        public Worker(string threadGroup ,Endpoint endpoint, WorkerCompletedEvent callback, ICollection<Notification> notify = null)
+        public Worker(string threadGroup ,Endpoint endpoint, WorkerCompletedEvent callback, ICollection<Notification> notify = null, ICollection<HttpStatusCode> successHttpStatus = null)
         {
             ThreadGroup = threadGroup;
             _Endpoint = endpoint;
             _Notifications = notify;
             _Callback = callback;
+            _SuccessHttpStatus = successHttpStatus;
         }
 
         public abstract Task<WorkerResult> DoWorkAsync(T payload);
@@ -45,15 +46,15 @@ namespace Interact.Library.Structure
             }
         }
 
-        public virtual async Task Run(T payload, ICollection<HttpStatusCode> successHttpStatus)
+        public virtual async Task Run(T payload)
         {
-            successHttpStatus = successHttpStatus ?? new List<HttpStatusCode> { HttpStatusCode.OK };
+            _SuccessHttpStatus = _SuccessHttpStatus ?? new List<HttpStatusCode> { HttpStatusCode.OK };
 
             try
             {
-                var result = DoWorkAsync().Result;
+                var result = DoWorkAsync(payload).Result;
 
-                if (successHttpStatus.Contains(result.Status))
+                if (_SuccessHttpStatus.Contains(result.Status))
                 {
                     await SendNotifications( NotificationType.SUCCESS, result);
                     await _Callback(payload.GetObjectIdentifier());
@@ -64,11 +65,11 @@ namespace Interact.Library.Structure
                     await SendNotifications(NotificationType.FAILURE, result);
                 }
 
-                Log.Info($"Worker from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid} message {payload.GetObjectIdentifier()} processed.");
+                Log.Info($"Worker from ThreadGroup '{this.ThreadGroup}' message {payload.GetObjectIdentifier()} processed.");
             }
             catch(Exception ex)
             {
-                Log.Fatal($"Worker from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid} had a fatal error and was killed", exception: ex);
+                Log.Fatal($"Worker from ThreadGroup '{this.ThreadGroup}' had a fatal error and was killed", exception: ex);
                 await SendNotifications(NotificationType.ERROR, new WorkerResult { Exception = ex });
             }
         }
