@@ -19,13 +19,8 @@ namespace Interact.Instance.Components.Amazon.Model
             this._WorkerBluePrint = workerBluePrint;
         }
 
-        public async Task Run(int maxWorkers = 10)
+        public async Task Run()
         {
-            if(maxWorkers < 0)
-            {
-                throw new ArgumentOutOfRangeException("Max number of workers must be a integer more than one.");
-            }
-
             Task consumer = _ConsumerBluePrint.Run();
             List<Task> workers = new List<Task>();
             while (true)
@@ -35,16 +30,16 @@ namespace Interact.Instance.Components.Amazon.Model
                     break;
                 }
 
-                while(workers.Count < maxWorkers)
+                while(workers.Count < _ConsumerBluePrint.MaxMemoryQueueObjects)
                 {
-                    workers.RemoveAll(w => w.IsCompleted || w.IsFaulted || w.IsCanceled || w.IsCompletedSuccessfully);
-
                     T message;
                     if (_ConsumerBluePrint.MemoryQueue.TryDequeue(out message))
                     {
                         workers.Add(_WorkerBluePrint.Run(message));
                     }
                 }
+
+                workers.RemoveAll(w => w.IsCompleted || w.IsFaulted || w.IsCanceled || w.IsCompletedSuccessfully);
             }
         }
     }
