@@ -19,25 +19,24 @@ namespace Interact.Library.Structure
             ThreadGroup = threadGroup;
         }
 
-        public abstract void SendNotification();
+        public abstract void SendNotification(WorkerResult notifyItem);
 
-        public virtual async Task Notify()
+        public virtual async Task Notify(WorkerResult notifyItem)
         {
             try
             {
-                SendNotification();
+                SendNotification(notifyItem);
             }
             catch(Exception ex)
             {
                 Log.Error($"Notification of {this.Type.ToString()} from ThreadGroup '{this.ThreadGroup}' could not be sent.", exception: ex);
             }
         }
-
     }
 
     public enum NotificationType
     {
-        SUCESS,
+        SUCCESS,
         ERROR,
         FAILURE
     }

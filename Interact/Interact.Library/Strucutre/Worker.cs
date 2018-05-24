@@ -4,15 +4,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Linq;
 using Interact.Library.Interfaces;
+using System.Net;
 
 namespace Interact.Library.Structure
 {
     public delegate Task WorkerCompletedEvent(object identifier);
 
-    public abstract class Worker<T> where T:IWorkerObject
+    public abstract class Worker<T> where T:IQueueObject
     {
         private static readonly log4net.ILog Log = log4net.LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
-        private Endpoint _Endpoint;
+        protected Endpoint _Endpoint;
         private ICollection<Notification> _Notifications;
         private WorkerCompletedEvent _Callback = null;
 
@@ -27,34 +28,40 @@ namespace Interact.Library.Structure
             _Callback = callback;
         }
 
-        /// <summary>
-        /// Returns if the task was completed sucessfully
-        /// </summary>
-        /// <param name="payload">Message that will be send.</param>
-        /// <returns></returns>
-        public abstract Task<bool> DoWork(T payload, Endpoint endpoint, ICollection<Notification> notifications = null);
+        public abstract Task<WorkerResult> DoWorkAsync(T payload);
 
-        public virtual async Task Run(T payload)
+        protected virtual async Task SendNotifications(NotificationType type, WorkerResult result)
         {
-            List<Task> sender = new List<Task>();
+            if (!_Notifications.NullOrEmpty())
+            {
+                List<Task> sender = new List<Task>();
+
+                _Notifications.Where(n => n.Type == NotificationType.FAILURE).ToList().ForEach((notification) =>
+                {
+                    sender.Add(notification.Notify(result));
+                });
+
+                Task.WaitAll(sender.ToArray());
+            }
+        }
+
+        public virtual async Task Run(T payload, ICollection<HttpStatusCode> successHttpStatus)
+        {
+            successHttpStatus = successHttpStatus ?? new List<HttpStatusCode> { HttpStatusCode.OK };
 
             try
             {
-                if (DoWork(payload, _Endpoint, _Notifications).Result)
+                var result = DoWorkAsync().Result;
+
+                if (successHttpStatus.Contains(result.Status))
                 {
+                    await SendNotifications( NotificationType.SUCCESS, result);
                     await _Callback(payload.GetObjectIdentifier());
+
                 }
                 else
                 {
-                    if (!_Notifications.NullOrEmpty())
-                    {
-                        _Notifications.Where(n => n.Type == NotificationType.FAILURE).ToList().ForEach((notification) =>
-                          {
-                              sender.Add(notification.Notify());
-                          });
-
-                        Task.WaitAll(sender.ToArray());
-                    }
+                    await SendNotifications(NotificationType.FAILURE, result);
                 }
 
                 Log.Info($"Worker from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid} message {payload.GetObjectIdentifier()} processed.");
@@ -62,16 +69,7 @@ namespace Interact.Library.Structure
             catch(Exception ex)
             {
                 Log.Fatal($"Worker from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid} had a fatal error and was killed", exception: ex);
-
-                if (!_Notifications.NullOrEmpty())
-                {
-                    _Notifications.Where(n => n.Type == NotificationType.ERROR).ToList().ForEach((notification) =>
-                    {
-                        sender.Add(notification.Notify());
-                    });
-
-                    Task.WaitAll(sender.ToArray());
-                }
+                await SendNotifications(NotificationType.ERROR, new WorkerResult { Exception = ex });
             }
         }
     }

@@ -85,8 +85,6 @@ namespace Interact.Library.Structure
                     Log.Error($"Consumer from ThreadGroup '{this.ThreadGroup}' and ThreadGuid:'{this.ThreadGuid}  could not load the consumer server status.", exception: ex);
                     _ConsumerStatus = ConsumerStatus.OFFLINE;
                 }
-
-                NotifyConsumerClientStatus();
             }
         }
 

@@ -4,7 +4,7 @@ using System.Text;
 
 namespace Interact.Library.Interfaces
 {
-    public interface IWorkerObject
+    public interface IQueueObject
     {
         string GetObjectIdentifier();
     }

@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 
 namespace Interact.Library.Structure
 {
@@ -6,5 +7,6 @@ namespace Interact.Library.Structure
     {
         public string RequestResult { get; set; }
         public HttpStatusCode Status { get; set; }
+        public Exception Exception { get; set; }
     }
 }

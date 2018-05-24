@@ -8,10 +8,11 @@ using System.Text;
 using Newtonsoft.Json;
 using Microsoft.Extensions.Caching.Distributed;
 using Interact.Instance.Exceptions;
+using Interact.Instance.Components.Amazon.Model;
 
 namespace Interact.Instance.Components.Amazon
 {
-    public class JSONConsumer : Consumer<string>
+    public class JSONConsumer : Consumer<JSONString>
     {
         private AWSQueueConfiguration _QueueConfiguration;
         private IServiceProvider _Services;
@@ -31,13 +32,14 @@ namespace Interact.Instance.Components.Amazon
             }
         }
 
-        public override ICollection<string> GetObjectsFromQueue(int maxObjects)
+        public override ICollection<JSONString> GetObjectsFromQueue(int maxObjects)
         {
             var messages = _QueueConfiguration.RetriveQueueObjects();
             return messages.Select(m => 
             {
                 LockMessage(m.MessageId);
-                return JsonConvert.SerializeObject(m);
+                var jsonObject = new JSONString(JsonConvert.SerializeObject(m), m.ReceiptHandle);
+                return jsonObject;
 
            }).ToList();
         }
@@ -69,10 +71,10 @@ namespace Interact.Instance.Components.Amazon
             }
         }
 
-        public override void RemoveObjectFromQueue(string identity)
+        public override void RemoveObjectFromQueue(JSONString identifier)
         {
-            _QueueConfiguration.RemoveQueueObjects(identity);
-            ReleaseMessage(identity);
+            _QueueConfiguration.RemoveQueueObjects(identifier.Identifier);
+            ReleaseMessage(identifier.Identifier);
         }
 
         protected override void NotifyConsumerClientStatus()
