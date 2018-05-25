@@ -5,15 +5,15 @@ using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Interact.Instance.Components.Amazon.Model
+namespace Interact.Instance
 {
-    public class InstanceThreadPool<T>
+    public class ThreadPoolInstance<T>
         where T : IQueueObject
     {
         private Consumer<T> _ConsumerBluePrint { get; set; }
         private Worker<T> _WorkerBluePrint { get; set; }
 
-        public InstanceThreadPool(Consumer<T> consumerBluePrint, Worker<T> workerBluePrint)
+        public ThreadPoolInstance(Consumer<T> consumerBluePrint, Worker<T> workerBluePrint)
         {
             this._ConsumerBluePrint = consumerBluePrint;
             this._WorkerBluePrint = workerBluePrint;
@@ -25,12 +25,12 @@ namespace Interact.Instance.Components.Amazon.Model
             List<Task> workers = new List<Task>();
             while (true)
             {
-                if(consumer.IsCompleted || consumer.IsFaulted || consumer.IsCanceled || consumer.IsCompletedSuccessfully)
+                if (consumer.IsCompleted || consumer.IsFaulted || consumer.IsCanceled || consumer.IsCompletedSuccessfully)
                 {
                     break;
                 }
 
-                while(workers.Count < _ConsumerBluePrint.MaxMemoryQueueObjects)
+                while (workers.Count < _ConsumerBluePrint.MemoryQueue.Count)
                 {
                     T message;
                     if (_ConsumerBluePrint.MemoryQueue.TryDequeue(out message))
