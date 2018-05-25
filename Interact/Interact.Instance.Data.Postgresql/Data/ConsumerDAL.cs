@@ -17,6 +17,13 @@ namespace Interact.Instance.Data.Postgresql.Data
             this.Dispose();
         }
 
+        private IServiceProvider _Services;
+
+        public ConsumerDAL(IServiceProvider serivces)
+        {
+            _Services = serivces;
+        }
+
         public TransactionScope CreateTransactionScope(IsolationLevel isolation = IsolationLevel.ReadCommitted, TimeSpan? timeout = null)
         {
             timeout = timeout ?? new TimeSpan(0, 0, 30);
@@ -25,7 +32,7 @@ namespace Interact.Instance.Data.Postgresql.Data
 
         public Library.Structure.ConsumerStatus GetThreadGroupServerStatus(string threadGroup)
         {
-            using (var context = new InteractContext())
+            using (var context = _Services.GetService(typeof(InteractContext)) as InteractContext)
             {
                 return context.CloudInstance.Where(c => c.Threadgroup == threadGroup).Select(c=> (Library.Structure.ConsumerStatus)c.ConsumerStatusId).FirstOrDefault();
             }
@@ -33,7 +40,7 @@ namespace Interact.Instance.Data.Postgresql.Data
 
         public void SetConsumerThreadStatus(string threadGroup, string identifier, Library.Structure.ConsumerStatus clientStatus)
         {
-            using (var context = new InteractContext())
+            using (var context = _Services.GetService(typeof(InteractContext)) as InteractContext)
             {
                 using (var scope = CreateTransactionScope())
                 {
@@ -73,7 +80,7 @@ namespace Interact.Instance.Data.Postgresql.Data
 
         private CloudInstance GetCloudInstance(string threadGroup)
         {
-            using(var context = new InteractContext())
+            using(var context = _Services.GetService(typeof(InteractContext)) as InteractContext)
             {
                 return context.CloudInstance.Where(c => c.Threadgroup == threadGroup).FirstOrDefault();
             }

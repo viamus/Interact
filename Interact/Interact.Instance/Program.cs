@@ -1,24 +1,30 @@
 ﻿using log4net.Config;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Reflection;
-using System.Text;
 using System.Xml;
+using Microsoft.EntityFrameworkCore;
+using Interact.Instance.Data.Postgresql.InteractDomain;
 
 namespace Interact.Instance
 {
     class Program
     {
-        private static readonly log4net.ILog log = log4net.LogManager.GetLogger(typeof(Program));
+        private static readonly log4net.ILog _Log = log4net.LogManager.GetLogger(typeof(Program));
+
+        private static IConfigurationRoot _Configuration;
+
+        private static ServiceProvider _Services;
 
         public static void Main(string[] args)
         {
-            ConfigureLog4Net();
+            LoadLog4Net();
+            LoadAppConfig();
+            LoadInstanceServices();
         }
 
-        private static void ConfigureLog4Net()
+        private static void LoadLog4Net()
         {
             XmlDocument log4netConfig = new XmlDocument();
 
@@ -29,9 +35,24 @@ namespace Interact.Instance
             XmlConfigurator.Configure(repo, log4netConfig["log4net"]);
         }
 
+        private static void LoadAppConfig()
+        {
+            var builder = new ConfigurationBuilder()
+                           .SetBasePath(Directory.GetCurrentDirectory())
+                           .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+
+            _Configuration = builder.Build();
+        }
+
         private static void LoadInstanceServices()
         {
             var services = new ServiceCollection();
+
+            services.AddDbContext<InteractContext>(
+                   options => options.UseNpgsql(
+                       _Configuration.GetConnectionString("InteractConnectionString")));
+
+            _Services = services.BuildServiceProvider();
         }
     }
 }
