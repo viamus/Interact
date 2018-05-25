@@ -118,7 +118,7 @@ namespace Interact.Library.Structure
                         }
                         else 
                         {
-                            if (_ConsumerStatus == ConsumerStatus.ONLINE && idleCount % 50 > 1)
+                            if (_ConsumerStatus == ConsumerStatus.ONLINE && idleCount >= 25 )
                             {
                                 _ConsumerStatus = ConsumerStatus.ONLINE_IDLE;
                             }          
