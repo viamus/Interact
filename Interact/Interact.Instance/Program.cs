@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Xml;
 using Microsoft.EntityFrameworkCore;
 using Interact.Instance.Data.Postgresql.InteractDomain;
+using Interact.Instance.Data.Interface;
 
 namespace Interact.Instance
 {
@@ -53,6 +54,14 @@ namespace Interact.Instance
                        _Configuration.GetConnectionString("InteractConnectionString")));
 
             _Services = services.BuildServiceProvider();
+        }
+
+        private static void LoadConsumerConfig(string threadGroup)
+        {
+            using (var consumerDal = _Services.GetService<IConsumerDAL>())
+            {
+                
+            }
         }
     }
 }

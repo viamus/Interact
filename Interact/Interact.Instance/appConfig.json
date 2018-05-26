@@ -1,6 +1,6 @@
 {
-  "ConnectionStrings": 
-  {
+  "ConnectionStrings": {
     "InteractConnectionString": "Host=localhost;Port=5432;Pooling=true;Database=interact;User Id=postgres;Password=postgres;"
   }
+
 }

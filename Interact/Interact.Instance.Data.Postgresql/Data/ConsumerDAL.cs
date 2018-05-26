@@ -78,6 +78,14 @@ namespace Interact.Instance.Data.Postgresql.Data
             }
         }
 
+        public void GetConsumerInstance(string threadGroup)
+        {
+            using (var context = _Services.GetService(typeof(InteractContext)) as InteractContext)
+            {
+                var instance = context.CloudInstance.Where(c => c.Threadgroup == threadGroup).FirstOrDefault();
+            }
+        }
+
         private CloudInstance GetCloudInstance(string threadGroup)
         {
             using(var context = _Services.GetService(typeof(InteractContext)) as InteractContext)
