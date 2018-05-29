@@ -53,6 +53,13 @@ namespace Interact.Instance
                    options => options.UseNpgsql(
                        _Configuration.GetConnectionString("InteractConnectionString")));
 
+            services.AddDistributedRedisCache(option =>
+            {
+                option.Configuration = _Configuration.GetConnectionString("RedisConnectionString");
+                option.InstanceName = "interact_redis";
+                
+            });
+
             _Services = services.BuildServiceProvider();
         }
 
