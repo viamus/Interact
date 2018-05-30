@@ -16,6 +16,11 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
         public virtual DbSet<WorkerConfiguration> WorkerConfiguration { get; set; }
         public virtual DbSet<WorkerType> WorkerType { get; set; }
 
+        public InteractContext(DbContextOptions<InteractContext> options) :
+            base(options)
+        {
+        }
+
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
