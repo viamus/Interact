@@ -6,9 +6,17 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
 {
     public partial class InteractContext : DbContext
     {
+        public InteractContext()
+        {
+        }
+
+        public InteractContext(DbContextOptions<InteractContext> options)
+            : base(options)
+        {
+        }
+
         public virtual DbSet<CloudClientInstance> CloudClientInstance { get; set; }
         public virtual DbSet<CloudConfiguration> CloudConfiguration { get; set; }
-        public virtual DbSet<CloudConsumerConfiguration> CloudConsumerConfiguration { get; set; }
         public virtual DbSet<CloudInstance> CloudInstance { get; set; }
         public virtual DbSet<CloudQueueConfiguration> CloudQueueConfiguration { get; set; }
         public virtual DbSet<ConsumerStatus> ConsumerStatus { get; set; }
@@ -16,16 +24,11 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
         public virtual DbSet<WorkerConfiguration> WorkerConfiguration { get; set; }
         public virtual DbSet<WorkerType> WorkerType { get; set; }
 
-        public InteractContext(DbContextOptions<InteractContext> options) :
-            base(options)
-        {
-        }
-
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
             if (!optionsBuilder.IsConfigured)
             {
-                optionsBuilder.UseNpgsql(@"Host=localhost;Database=interact;Username=postgres;Password=postgres");
+                optionsBuilder.UseNpgsql("Host=localhost;Database=interact;Username=postgres;Password=postgres");
             }
         }
 
@@ -53,23 +56,6 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
                 entity.Property(e => e.Id).ValueGeneratedNever();
             });
 
-            modelBuilder.Entity<CloudConsumerConfiguration>(entity =>
-            {
-                entity.Property(e => e.Id).ValueGeneratedNever();
-
-                entity.HasOne(d => d.CloudQueueConfiguration)
-                    .WithMany(p => p.CloudConsumerConfiguration)
-                    .HasForeignKey(d => d.CloudQueueConfigurationId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fk_cloud_consumer_configuration_cloud_queue_configuration_id");
-
-                entity.HasOne(d => d.ConsumerType)
-                    .WithMany(p => p.CloudConsumerConfiguration)
-                    .HasForeignKey(d => d.ConsumerTypeId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fk_cloud_consumer_configuration_consumer_type_id");
-            });
-
             modelBuilder.Entity<CloudInstance>(entity =>
             {
                 entity.HasIndex(e => e.Threadgroup)
@@ -78,11 +64,11 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
 
                 entity.Property(e => e.Id).ValueGeneratedNever();
 
-                entity.HasOne(d => d.CloudConsumerConfiguration)
+                entity.HasOne(d => d.CloudQueueConfiguration)
                     .WithMany(p => p.CloudInstance)
-                    .HasForeignKey(d => d.CloudConsumerConfigurationId)
+                    .HasForeignKey(d => d.CloudQueueConfigurationId)
                     .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("fk_cloud_instance_cloud_consumer_configuration_id");
+                    .HasConstraintName("fk_cloud_instance_cloud_queue_configuration_id");
 
                 entity.HasOne(d => d.ConsumerStatus)
                     .WithMany(p => p.CloudInstance)
@@ -120,8 +106,8 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
 
             modelBuilder.Entity<WorkerConfiguration>(entity =>
             {
-                entity.HasIndex(e => e.Threadgroup)
-                    .HasName("worker_configuration_threadgroup_key")
+                entity.HasIndex(e => e.Name)
+                    .HasName("worker_configuration_name_key")
                     .IsUnique();
 
                 entity.Property(e => e.Id).ValueGeneratedNever();

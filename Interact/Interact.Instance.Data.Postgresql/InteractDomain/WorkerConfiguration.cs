@@ -17,14 +17,14 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
         public int Id { get; set; }
         [Column("worker_type_id")]
         public int WorkerTypeId { get; set; }
-        [Column("threadgroup")]
-        public string Threadgroup { get; set; }
         [Required]
-        [Column("name")]
+        [Column("name", TypeName = "character varying(200)")]
         public string Name { get; set; }
         [Required]
         [Column("json")]
         public string Json { get; set; }
+        [Column("blueprint")]
+        public bool Blueprint { get; set; }
 
         [ForeignKey("WorkerTypeId")]
         [InverseProperty("WorkerConfiguration")]

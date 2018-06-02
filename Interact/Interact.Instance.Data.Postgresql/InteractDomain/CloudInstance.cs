@@ -15,18 +15,20 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
 
         [Column("id")]
         public int Id { get; set; }
-        [Column("threadgroup")]
+        [Column("threadgroup", TypeName = "character varying(200)")]
         public string Threadgroup { get; set; }
         [Column("consumer_status_id")]
         public int ConsumerStatusId { get; set; }
-        [Column("cloud_consumer_configuration_id")]
-        public int CloudConsumerConfigurationId { get; set; }
+        [Column("cloud_queue_configuration_id")]
+        public int CloudQueueConfigurationId { get; set; }
         [Column("worker_configuration_id")]
         public int WorkerConfigurationId { get; set; }
+        [Column("blueprint")]
+        public bool Blueprint { get; set; }
 
-        [ForeignKey("CloudConsumerConfigurationId")]
+        [ForeignKey("CloudQueueConfigurationId")]
         [InverseProperty("CloudInstance")]
-        public CloudConsumerConfiguration CloudConsumerConfiguration { get; set; }
+        public CloudQueueConfiguration CloudQueueConfiguration { get; set; }
         [ForeignKey("ConsumerStatusId")]
         [InverseProperty("CloudInstance")]
         public ConsumerStatus ConsumerStatus { get; set; }

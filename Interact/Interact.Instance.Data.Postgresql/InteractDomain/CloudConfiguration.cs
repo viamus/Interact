@@ -16,11 +16,13 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
         [Column("id")]
         public int Id { get; set; }
         [Required]
-        [Column("name")]
+        [Column("name", TypeName = "character varying(200)")]
         public string Name { get; set; }
         [Required]
         [Column("json")]
         public string Json { get; set; }
+        [Column("blueprint")]
+        public bool Blueprint { get; set; }
 
         [InverseProperty("CloudConfiguration")]
         public ICollection<CloudQueueConfiguration> CloudQueueConfiguration { get; set; }

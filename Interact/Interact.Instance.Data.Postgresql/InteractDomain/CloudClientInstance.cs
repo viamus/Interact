@@ -9,7 +9,7 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
     public partial class CloudClientInstance
     {
         [Key]
-        [Column("identifier")]
+        [Column("identifier", TypeName = "character varying(50)")]
         public string Identifier { get; set; }
         [Column("cloud_instance_id")]
         public int CloudInstanceId { get; set; }

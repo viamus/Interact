@@ -17,7 +17,7 @@ namespace Interact.Instance.Data.Postgresql.InteractDomain
         [Column("id")]
         public int Id { get; set; }
         [Required]
-        [Column("name")]
+        [Column("name", TypeName = "character varying(100)")]
         public string Name { get; set; }
 
         [InverseProperty("ConsumerStatus")]
