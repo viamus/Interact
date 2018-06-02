@@ -21,18 +21,24 @@ namespace Interact.Instance.Data.Postgresql.Mapper
             }
         }
 
-
         private void LoadMapperConfig()
         {
-            var config = new MapperConfiguration(mapper =>
+            _MapperConfig = new MapperConfiguration(mapper =>
             {
                 LoadCloudInstanceMapper(mapper);
+                LoadWorkerConfigurationMapper(mapper);
             });
         }
 
         private void LoadWorkerConfigurationMapper(IMapperConfigurationExpression mapper)
         {
-
+            mapper.CreateMap<InteractDomain.WorkerConfiguration, WorkerConfiguration>()
+                .ForMember(target => target.Id, m => m.MapFrom(source => source.Id))
+                .ForMember(target => target.Threadgroup, m => m.MapFrom(source => source.Threadgroup))
+                .ForMember(target => target.WorkerTypeId, m => m.MapFrom(source => source.WorkerTypeId))
+                .ForMember(target => target.Name, m => m.MapFrom(source => source.Name))
+                .ForMember(target => target.Json, m => m.MapFrom(source => source.Json))
+                .ForMember(target => target.Id, m => m.MapFrom(source => source.Id));
         }
 
         private void LoadCloudInstanceMapper(IMapperConfigurationExpression mapper)
@@ -40,11 +46,10 @@ namespace Interact.Instance.Data.Postgresql.Mapper
             mapper.CreateMap<InteractDomain.CloudInstance, CloudInstance>()
                    .ForMember(target => target.Id, m => m.MapFrom(source => source.Id))
                    .ForMember(target => target.Threadgroup, m => m.MapFrom(source => source.Threadgroup))
-                   .ForMember(target => target.ConsumerStatus, m => m.MapFrom(source => (ConsumerStatus)source.ConsumerStatusId));
-                   
+                   .ForMember(target => target.CloudConsumerConfigurationId, m => m.MapFrom(source => source.CloudConsumerConfigurationId))
+                   .ForMember(target => target.ConsumerStatusId, m => m.MapFrom(source => source.ConsumerStatusId))
+                   .ForMember(target => target.WorkerConfigurationId, m => m.MapFrom(source => source.WorkerConfigurationId))
+                   .ForMember(target => target.ConsumerStatus, m => m.MapFrom(source => (ConsumerStatus)source.ConsumerStatusId));    
         }
-
-
-
     }
 }

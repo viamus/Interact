@@ -41,7 +41,6 @@ CREATE TABLE CLOUD_QUEUE_CONFIGURATION(
 	NAME    VARCHAR(200) NOT NULL,
 	JSON	TEXT NOT NULL,
 	CONSTRAINT FK_CLOUD_QUEUE_CONFIGURATION_CLOUD_CONFIGURATION_ID FOREIGN KEY (CLOUD_CONFIGURATION_ID) REFERENCES CLOUD_CONFIGURATION (ID)
-
 );
 
 CREATE TABLE CLOUD_CONSUMER_CONFIGURATION(
@@ -73,4 +72,44 @@ CREATE TABLE CLOUD_CLIENT_INSTANCE(
 	UPDATED TIMESTAMP NOT NULL,
 	CONSTRAINT FK_CLOUD_CLIENT_INSTANCE_CONSUMER_STATUS_ID FOREIGN KEY (CONSUMER_STATUS_ID) REFERENCES CONSUMER_STATUS (ID),
 	CONSTRAINT FK_CLOUD_CLIENT_INSTANCE_CLOUD_INSTANCE_ID FOREIGN KEY (CLOUD_INSTANCE_ID) REFERENCES CLOUD_INSTANCE (ID)
+);
+
+INSERT INTO CONSUMER_TYPE (ID ,NAME, ASSEMBLY, VERSION) VALUES(1, 'Amazon.SQS - JSONConsumer', 'Interact.Instance.Components.Amazon.JSONConsumer', '1.0.0');
+INSERT INTO WORKER_TYPE   (ID, NAME, ASSEMBLY, VERSION) VALUES(1 ,'JSONWorker', 'Interact.Instance.Components.JSONWorker', '1.0.0');
+
+INSERT INTO CONSUMER_STATUS (ID, NAME) VALUES (1, 'DISPOSE');
+INSERT INTO CONSUMER_STATUS (ID, NAME) VALUES (2 ,'OFFLINE');
+INSERT INTO CONSUMER_STATUS (ID, NAME) VALUES (3, 'ONLINE');
+INSERT INTO CONSUMER_STATUS (NAME) VALUES (4, 'ONLINE IDLE');
+
+INSERT INTO WORKER_CONFIGURATION(WORKER_TYPE_ID ,THREADGROUP, NAME, JSON) VALUES
+(
+	1,
+	'InteractJSONWorkerBlueprint',
+	'JSONWorker - Blueprint',
+	'{\r\n  \"Endpoint\":{\r\n    \"Url\": \"Endpoint of the request\",\r\n    \"Headers\": [{\r\n        \"HeaderName\":\"HeaderValue\"\r\n    }],\r\n    \"RequestMethod\":\"RequestMethod - Like POST, GET, DELETE\"\r\n  }\r\n}'
+);
+
+INSERT INTO CLOUD_CONFIGURATION(ID,	NAME,JSON) VALUES
+(
+	1, 
+	'Amazon Cloud Configuration - Blueprint',
+	'{\r\n  \"AccessKey\":\"Default Access Key to the aws\",\r\n  \"SecretKey\":\"Default Secret Key to the aws\"\r\n}'
+);
+
+INSERT INTO CLOUD_QUEUE_CONFIGURATION(ID,  CLOUD_CONFIGURATION_ID,  NAME, JSON) VALUES
+(
+	1,
+	1,
+	'Amazon SQS Configuration - Blueprint',
+	'{\r\n    \"QueueEndpoint\":\"Default queue endpoint\",\r\n    \"Region\":\"region of aws queue located\",\r\n    \"MaxMemoryQueueObjects\":\"Default:10 objects in memory\",\r\n    \"VislibityTimeout\":\"Default:60 seconds\",\r\n    \"WaitTimeSeconds\" :\"Default:5 seconds\" \r\n}'
+);
+
+INSERT INTO CLOUD_CONSUMER_CONFIGURATION(ID,CONSUMER_TYPE_ID,CLOUD_QUEUE_CONFIGURATION_ID,NAME,JSON) VALUES
+(
+	1,
+	1,
+	1,
+	'AMAZON JSONConsumer Configuration - BluePrint',
+	''
 );

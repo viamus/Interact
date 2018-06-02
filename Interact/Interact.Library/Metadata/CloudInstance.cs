@@ -11,6 +11,12 @@ namespace Interact.Library.Metadata
 
         public string Threadgroup { get; set; }
 
+        public int CloudConsumerConfigurationId { get; set; }
+
+        public int ConsumerStatusId { get; set; }
+
+        public int WorkerConfigurationId { get; set; }
+
         public CloudConsumerConfiguration CloudConsumerConfiguration { get; set; }
 
         public ConsumerStatus ConsumerStatus { get; set; }

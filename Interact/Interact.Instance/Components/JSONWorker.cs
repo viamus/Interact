@@ -7,7 +7,7 @@ using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace Interact.Instance.Components.Amazon
+namespace Interact.Instance.Components
 {
     public class JSONWorker : Worker<JSONString>
     {
