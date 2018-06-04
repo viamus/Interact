@@ -7,6 +7,7 @@ using System.Text;
 using System.Linq;
 using System.Transactions;
 using Interact.Instance.Data.Exceptions;
+using Interact.Instance.Data.Postgresql.InteractDomain.Context;
 
 namespace Interact.Instance.Data.Postgresql.Data
 {
@@ -34,7 +35,7 @@ namespace Interact.Instance.Data.Postgresql.Data
         {
             using (var context = _Services.GetService(typeof(InteractContext)) as InteractContext)
             {
-                return context.CloudInstance.Where(c => c.Threadgroup == threadGroup).Select(c=> (Library.Structure.ConsumerStatus)c.ConsumerStatusId).FirstOrDefault();
+                return context.CloudInstance.Where(c => c.Threadgroup == threadGroup).Select(c => (Library.Structure.ConsumerStatus)c.ConsumerStatusId).FirstOrDefault();
             }
         }
 
@@ -46,7 +47,7 @@ namespace Interact.Instance.Data.Postgresql.Data
                 {
                     var clientInstance = context.CloudClientInstance.Where(c => c.Identifier == identifier).FirstOrDefault();
 
-                    if(clientInstance == null)
+                    if (clientInstance == null)
                     {
                         var serverInstance = GetCloudInstance(threadGroup);
 
@@ -70,7 +71,7 @@ namespace Interact.Instance.Data.Postgresql.Data
                         clientInstance.ConsumerStatusId = Convert.ToInt32(clientStatus);
                         clientInstance.Updated = DateTime.Now;
                         context.CloudClientInstance.Update(clientInstance);
-                       
+
                     }
                     context.SaveChanges();
                     scope.Complete();
@@ -88,7 +89,7 @@ namespace Interact.Instance.Data.Postgresql.Data
 
         private CloudInstance GetCloudInstance(string threadGroup)
         {
-            using(var context = _Services.GetService(typeof(InteractContext)) as InteractContext)
+            using (var context = _Services.GetService(typeof(InteractContext)) as InteractContext)
             {
                 return context.CloudInstance.Where(c => c.Threadgroup == threadGroup).FirstOrDefault();
             }

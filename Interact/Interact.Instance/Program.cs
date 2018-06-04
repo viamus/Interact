@@ -5,8 +5,8 @@ using System.IO;
 using System.Reflection;
 using System.Xml;
 using Microsoft.EntityFrameworkCore;
-using Interact.Instance.Data.Postgresql.InteractDomain;
 using Interact.Instance.Data.Interface;
+using Interact.Instance.Data.Postgresql.InteractDomain.Context;
 
 namespace Interact.Instance
 {
@@ -57,7 +57,7 @@ namespace Interact.Instance
             {
                 option.Configuration = _Configuration.GetConnectionString("RedisConnectionString");
                 option.InstanceName = "interact_redis";
-                
+
             });
 
             _Services = services.BuildServiceProvider();
@@ -67,7 +67,7 @@ namespace Interact.Instance
         {
             using (var consumerDal = _Services.GetService<IConsumerDAL>())
             {
-                
+
             }
         }
     }

@@ -11,7 +11,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Interact.Instance.Data", "I
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Interact.Instance.Data.Postgresql", "Interact.Instance.Data.Postgresql\Interact.Instance.Data.Postgresql.csproj", "{CBF0046B-4784-41EE-897C-0BD908A7228C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interact.Instance.Web", "Interact.Instance.Web\Interact.Instance.Web.csproj", "{3D180F8D-CDAB-4CE4-B58B-ACA9FB837DA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interact.Instance.Web.Api", "Interact.Instance.Web.Api\Interact.Instance.Web.Api.csproj", "{A9D956BE-8BEC-4A61-88D7-55D4A72EC2A1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Interact.Instance.Web", "Interact.Instance.Web\Interact.Instance.Web.csproj", "{7B8B64E9-26DC-49B9-B269-B881B3A6903C}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,10 +37,14 @@ Global
 		{CBF0046B-4784-41EE-897C-0BD908A7228C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CBF0046B-4784-41EE-897C-0BD908A7228C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CBF0046B-4784-41EE-897C-0BD908A7228C}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3D180F8D-CDAB-4CE4-B58B-ACA9FB837DA0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D180F8D-CDAB-4CE4-B58B-ACA9FB837DA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D180F8D-CDAB-4CE4-B58B-ACA9FB837DA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D180F8D-CDAB-4CE4-B58B-ACA9FB837DA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A9D956BE-8BEC-4A61-88D7-55D4A72EC2A1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A9D956BE-8BEC-4A61-88D7-55D4A72EC2A1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A9D956BE-8BEC-4A61-88D7-55D4A72EC2A1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A9D956BE-8BEC-4A61-88D7-55D4A72EC2A1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B8B64E9-26DC-49B9-B269-B881B3A6903C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B8B64E9-26DC-49B9-B269-B881B3A6903C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B8B64E9-26DC-49B9-B269-B881B3A6903C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B8B64E9-26DC-49B9-B269-B881B3A6903C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

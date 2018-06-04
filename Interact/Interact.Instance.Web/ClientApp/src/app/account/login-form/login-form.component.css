@@ -1,0 +1,24 @@
+.new-user-alert {
+  padding-top: 2.5rem
+}
+
+.login-form > mat-form-field {
+  display: flex;
+  flex-direction: column;
+}
+
+  .login-form > input {
+    width: 100%;
+  }
+
+.center {
+  width: 40%;
+  margin: 10px auto;
+}
+
+.main-div {
+  height: 75vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}

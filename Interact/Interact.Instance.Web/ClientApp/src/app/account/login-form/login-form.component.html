@@ -1,0 +1,21 @@
+<div class="main-div">
+  <mat-card class="z-depth center">
+    <!--<mat-card-header>
+    <mat-card-title>
+      Login
+    </mat-card-title>
+  </mat-card-header>-->
+    <alert></alert>
+    <mat-card-content>
+      <form class="login-form" #f="ngForm" novalidate (ngSubmit)="login(f)">
+        <mat-form-field>
+          <input type="text" matInput placeholder="Username" name="userName" [(ngModel)]="model.userName" #userName="ngModel" required />
+        </mat-form-field>
+        <mat-form-field>
+          <input type="password" matInput placeholder="Password" name="passwordHash" [(ngModel)]="model.passwordHash" #passwordHash="ngModel" required />
+        </mat-form-field>
+        <button type="submit" [disabled]="!passwordHash.valid || !userName.valid" matButton class="btn btn-custom" (ngClick)="login()">Login</button>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -5,7 +5,7 @@ using System.Text;
 
 namespace Interact.Instance.Data.Interface
 {
-   public interface IConsumerDAL:IDisposable
+    public interface IConsumerDAL : IDisposable
     {
         ConsumerStatus GetThreadGroupServerStatus(string threadGroup);
 

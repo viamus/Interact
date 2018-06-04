@@ -1,0 +1,13 @@
+.sidenav-container {
+  height: 100%;
+}
+
+.sidenav {
+  width: 200px;
+  box-shadow: 3px 0 6px rgba(0,0,0,.24);
+}
+
+.btn-logout {
+  position: absolute;
+  right: 20px;
+}
